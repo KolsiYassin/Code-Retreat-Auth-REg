@@ -90,6 +90,7 @@
         android:layout_height="53dp"
         android:layout_marginTop="32dp"
         android:backgroundTint="#FFFFFF"
+        android:onClick="onClick"
         android:text="Log In"
         android:textColor="#E5BA68"
         android:visibility="invisible"

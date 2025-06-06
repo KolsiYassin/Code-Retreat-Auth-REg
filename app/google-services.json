@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "820762433301",
+    "firebase_url": "https://coderetreat-d2855-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "coderetreat-d2855",
+    "storage_bucket": "coderetreat-d2855.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820762433301:android:3b302c579d421f0c54bb1c",
+        "android_client_info": {
+          "package_name": "com.example.viadee_coderetreat_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-N9bGWts-ij-o2phkGrTqujf-Vw2JW8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
