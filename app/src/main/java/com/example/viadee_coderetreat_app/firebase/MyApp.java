@@ -1,4 +1,4 @@
-package com.example.viadee_coderetreat_app;
+package com.example.viadee_coderetreat_app.firebase;
 
 import android.app.Application;
 
