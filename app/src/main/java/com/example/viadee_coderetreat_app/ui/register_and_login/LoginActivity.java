@@ -1,6 +1,5 @@
 package com.example.viadee_coderetreat_app.ui.register_and_login;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +24,7 @@ import com.example.viadee_coderetreat_app.ui.home.MainActivity;
 public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //standard onCreate function
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        //Get TextViews and Buttons
+        //Get UI
         TextView emailTextView = findViewById(R.id.name_edit_text);
         TextView passwordTextView = findViewById(R.id.password_edit_text);
         Button login = findViewById(R.id.Login);
@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                 .translationYBy(-600f)
                 .setDuration(1500)
                 .withEndAction(() -> {
+                    // Show UI
                     emailTextView.setVisibility(View.VISIBLE);
                     passwordTextView.setVisibility(View.VISIBLE);
                     login.setVisibility(View.VISIBLE);
@@ -70,11 +71,11 @@ public class LoginActivity extends AppCompatActivity {
             AuthService authservice = new AuthService(this);
             authservice.login(input,password,
                     //callbacks
-                    () -> {
+                    () -> { //onSuccess
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
                     },
-                    () -> {
+                    () -> { //onFailure
                         Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show();
                     }
             );
