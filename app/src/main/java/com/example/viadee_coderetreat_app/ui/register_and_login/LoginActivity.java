@@ -18,11 +18,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.viadee_coderetreat_app.R;
 import com.example.viadee_coderetreat_app.services.AuthService;
 import com.example.viadee_coderetreat_app.ui.home.MainActivity;
-
-
+import com.google.firebase.database.DatabaseReference;
 
 
 public class LoginActivity extends AppCompatActivity {
+
+
+    DatabaseReference dbRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
