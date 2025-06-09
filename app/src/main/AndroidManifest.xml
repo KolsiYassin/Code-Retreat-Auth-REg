@@ -13,15 +13,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Viadee_CodeRetreat_App">
         <activity
+            android:name=".ui.register_and_login.RegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.register_and_login.LoginActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.home.MainActivity" />
-
     </application>
 
 </manifest>
