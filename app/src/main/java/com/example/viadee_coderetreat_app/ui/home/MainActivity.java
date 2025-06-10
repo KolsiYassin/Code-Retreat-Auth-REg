@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String email = user.getEmail();
-            TextView view = findViewById(R.id.hello);
-            view.setText(email);
         }
     }
 }

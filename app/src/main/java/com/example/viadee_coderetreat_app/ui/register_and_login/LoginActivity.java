@@ -80,5 +80,9 @@ public class LoginActivity extends AppCompatActivity {
                     }
             );
         });
+        // Register Button Listener
+        register.setOnClickListener(v->{
+            startActivity(new Intent(this, RegisterActivity.class));
+        });
     }
 }

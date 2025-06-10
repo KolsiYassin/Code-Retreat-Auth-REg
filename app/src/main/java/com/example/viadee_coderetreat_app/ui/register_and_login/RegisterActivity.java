@@ -1,5 +1,6 @@
 package com.example.viadee_coderetreat_app.ui.register_and_login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -48,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        // Animation
+        // Logo animation
         ImageView logo = findViewById(R.id.logoImage);
         logo.animate().translationYBy(-600f).setDuration(1500).start();
 
@@ -64,10 +65,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         dbRef = FirebaseDatabase.getInstance().getReference("Users");
         auth = FirebaseAuth.getInstance();
+        /// registration
 
         registerbtn.setOnClickListener(view -> {
-            Toast.makeText(this, "Register button clicked", Toast.LENGTH_SHORT).show();
-            Log.d("Register", "Button clicked");
+            Log.d("Register", "Register button clicked");
 
             String username = userName.getText().toString().trim();
             String password = Password.getText().toString().trim();
@@ -76,6 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
             String id = ID.getText().toString().trim();
             String fName = firstName.getText().toString().trim();
             String lName = lastName.getText().toString().trim();
+            /// empty field check
 
             if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()
                     || email.isEmpty() || id.isEmpty() || fName.isEmpty() || lName.isEmpty()) {
@@ -87,53 +89,43 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            /// save using Auth
 
-            Toast.makeText(this, "Creating user...", Toast.LENGTH_SHORT).show();
             Log.d("Register", "Creating user in Firebase Auth");
 
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(this, "Firebase Auth success", Toast.LENGTH_SHORT).show();
-                            Log.d("Register", "Auth success");
-
-                            UserData newUser = new UserData(password, email, id, fName, lName);
-
-                            dbRef.child(username).setValue(newUser)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(this, "User saved in RTDB", Toast.LENGTH_LONG).show();
-                                        Log.d("Register", "Saved to RTDB");
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(this, "DB Save Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                        Log.e("Register", "RTDB Error", e);
+                            Log.d("Register", "Firebase user created.");
+                            String uid = auth.getCurrentUser().getUid();
+                            com.example.viadee_coderetreat_app.ui.register_and_login.UserData newUser = new com.example.viadee_coderetreat_app.ui.register_and_login.UserData(email, id, fName, lName);
+                            /// save in the RTDB
+                            dbRef.child(uid).setValue(newUser)
+                                    .addOnCompleteListener(dbTask -> {
+                                        if (dbTask.isSuccessful()) {
+                                            Log.d("Register", "User data saved to Realtime Database.");
+                                            Toast.makeText(this, "User saved !", Toast.LENGTH_LONG).show();
+                                            startActivity(new Intent(this, LoginActivity.class));
+                                        } else {
+                                            Exception e = dbTask.getException();
+                                            Log.e("Register", "Database error", e);
+                                            Toast.makeText(this, "Failed to save user: " +
+                                                    (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+                                        }
                                     });
+                            /// Error handling
+
                         } else {
                             Exception e = task.getException();
                             if (e instanceof FirebaseAuthUserCollisionException) {
                                 Toast.makeText(this, "Email already in use.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(this, "Auth failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                Log.e("Register", "Firebase Auth error", e);
+                                Toast.makeText(this, "Auth failed: " +
+                                        (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
                             }
-                            Log.e("Register", "Auth error", e);
                         }
                     });
         });
     }
-
-    public static class UserData {
-        public String password, email, id, firstName, lastName;
-
-        public UserData() {} // Required by Firebase
-
-        public UserData(String password, String email, String id, String firstName, String lastName) {
-            this.password = password;
-            this.email = email;
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-        }
-    }
 }
-
-
