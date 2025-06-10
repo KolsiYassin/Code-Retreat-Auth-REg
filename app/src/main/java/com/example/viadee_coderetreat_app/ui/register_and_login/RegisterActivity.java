@@ -1,6 +1,7 @@
 package com.example.viadee_coderetreat_app.ui.register_and_login;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,18 +15,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.viadee_coderetreat_app.R;
-import com.example.viadee_coderetreat_app.model.UserData;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class RegisterActivity extends AppCompatActivity {
 
     EditText userName, Password, Email, ID, firstName, lastName, passwordConfirmation;
     Button registerbtn;
     DatabaseReference dbRef;
+    FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +39,8 @@ public class RegisterActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Full immersive mode
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(
+        // Immersive Mode
+        getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -49,11 +48,9 @@ public class RegisterActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
+        // Animation
         ImageView logo = findViewById(R.id.logoImage);
-        logo.animate()
-                .translationYBy(-600f)
-                .setDuration(1500)
-                .start();
+        logo.animate().translationYBy(-600f).setDuration(1500).start();
 
         // Bind views
         userName = findViewById(R.id.userName);
@@ -65,10 +62,13 @@ public class RegisterActivity extends AppCompatActivity {
         lastName = findViewById(R.id.lastName);
         registerbtn = findViewById(R.id.registerbtn);
 
-        // Firebase reference
         dbRef = FirebaseDatabase.getInstance().getReference("Users");
+        auth = FirebaseAuth.getInstance();
 
         registerbtn.setOnClickListener(view -> {
+            Toast.makeText(this, "Register button clicked", Toast.LENGTH_SHORT).show();
+            Log.d("Register", "Button clicked");
+
             String username = userName.getText().toString().trim();
             String password = Password.getText().toString().trim();
             String confirmPassword = passwordConfirmation.getText().toString().trim();
@@ -77,45 +77,63 @@ public class RegisterActivity extends AppCompatActivity {
             String fName = firstName.getText().toString().trim();
             String lName = lastName.getText().toString().trim();
 
-            // Check for empty fields
-            if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
-                    email.isEmpty() || id.isEmpty() || fName.isEmpty() || lName.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()
+                    || email.isEmpty() || id.isEmpty() || fName.isEmpty() || lName.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Check if passwords match
             if (!password.equals(confirmPassword)) {
                 Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Check if username exists
-            dbRef.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        Toast.makeText(RegisterActivity.this, "Username is already used.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Save new user
-                        UserData newUser = new UserData(password, email, id, fName, lName);
-                        dbRef.child(username).setValue(newUser)
-                                .addOnSuccessListener(aVoid ->
-                                        Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show())
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(RegisterActivity.this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                    }
-                }
+            Toast.makeText(this, "Creating user...", Toast.LENGTH_SHORT).show();
+            Log.d("Register", "Creating user in Firebase Auth");
 
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Toast.makeText(RegisterActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Firebase Auth success", Toast.LENGTH_SHORT).show();
+                            Log.d("Register", "Auth success");
+
+                            UserData newUser = new UserData(password, email, id, fName, lName);
+
+                            dbRef.child(username).setValue(newUser)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(this, "User saved in RTDB", Toast.LENGTH_LONG).show();
+                                        Log.d("Register", "Saved to RTDB");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "DB Save Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        Log.e("Register", "RTDB Error", e);
+                                    });
+                        } else {
+                            Exception e = task.getException();
+                            if (e instanceof FirebaseAuthUserCollisionException) {
+                                Toast.makeText(this, "Email already in use.", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(this, "Auth failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                            Log.e("Register", "Auth error", e);
+                        }
+                    });
         });
     }
 
-    // Simple user model
+    public static class UserData {
+        public String password, email, id, firstName, lastName;
 
+        public UserData() {} // Required by Firebase
 
+        public UserData(String password, String email, String id, String firstName, String lastName) {
+            this.password = password;
+            this.email = email;
+            this.id = id;
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+    }
 }
+
+

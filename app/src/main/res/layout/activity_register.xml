@@ -53,27 +53,6 @@
             app:layout_constraintTop_toBottomOf="@+id/logoImage" />
 
         <EditText
-            android:id="@+id/userName"
-            android:layout_width="354dp"
-            android:layout_height="54dp"
-            android:layout_marginStart="41dp"
-            android:layout_marginTop="375dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="302dp"
-            android:background="#E5BA68"
-            android:backgroundTint="#E5BA68"
-            android:ems="10"
-            android:inputType="text"
-            android:text="User Name"
-            android:textColor="#FFFFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
-
-        <EditText
             android:id="@+id/Password"
             android:layout_width="354dp"
             android:layout_height="54dp"
@@ -179,6 +158,25 @@
             android:ems="10"
             android:inputType="text"
             android:text="Viadee's ID"
+            android:textColor="#FFFFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/userName"
+            android:layout_width="354dp"
+            android:layout_height="54dp"
+            android:layout_marginStart="42dp"
+            android:layout_marginTop="373dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="304dp"
+            android:background="#E5BA68"
+            android:backgroundTint="#E5BA68"
+            android:ems="10"
+            android:inputType="text"
+            android:text="Username"
             android:textColor="#FFFFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
