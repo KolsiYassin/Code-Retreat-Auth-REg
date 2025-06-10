@@ -1,6 +1,5 @@
 package com.example.viadee_coderetreat_app.ui.register_and_login;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,15 +17,14 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.viadee_coderetreat_app.R;
 import com.example.viadee_coderetreat_app.services.AuthService;
 import com.example.viadee_coderetreat_app.ui.home.MainActivity;
-import com.google.firebase.database.DatabaseReference;
+
+
 
 
 public class LoginActivity extends AppCompatActivity {
-
-
-    DatabaseReference dbRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //standard onCreate function
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
@@ -46,8 +44,8 @@ public class LoginActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        //Get TextViews and Buttons
-        TextView emailTextView = findViewById(R.id.firstname);
+        //Get UI
+        TextView emailTextView = findViewById(R.id.name_edit_text);
         TextView passwordTextView = findViewById(R.id.password_edit_text);
         Button login = findViewById(R.id.Login);
         Button register = findViewById(R.id.register);
@@ -58,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                 .translationYBy(-600f)
                 .setDuration(1500)
                 .withEndAction(() -> {
+                    // Show UI
                     emailTextView.setVisibility(View.VISIBLE);
                     passwordTextView.setVisibility(View.VISIBLE);
                     login.setVisibility(View.VISIBLE);
@@ -65,25 +64,21 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .start();
 
-        // Login Button listener
+        // Login button listener
         login.setOnClickListener(v -> {
             String input = emailTextView.getText().toString().trim();
             String password = passwordTextView.getText().toString().trim();
             AuthService authservice = new AuthService(this);
             authservice.login(input,password,
                     //callbacks
-                    () -> {
+                    () -> { //onSuccess
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
                     },
-                    () -> {
+                    () -> { //onFailure
                         Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show();
                     }
             );
-        });
-        // Register Button Listener
-        register.setOnClickListener(v->{
-            startActivity(new Intent(this, RegisterActivity.class));
         });
     }
 }
