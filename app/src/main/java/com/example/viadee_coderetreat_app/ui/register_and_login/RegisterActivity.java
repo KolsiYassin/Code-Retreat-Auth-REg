@@ -98,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d("Register", "Firebase user created.");
                             String uid = auth.getCurrentUser().getUid();
-                            com.example.viadee_coderetreat_app.ui.register_and_login.UserData newUser = new com.example.viadee_coderetreat_app.ui.register_and_login.UserData(email, id, fName, lName);
+                            com.example.viadee_coderetreat_app.ui.register_and_login.User newUser = new com.example.viadee_coderetreat_app.ui.register_and_login.User(fName,lName,username,email, id );
                             /// save in the RTDB
                             dbRef.child(uid).setValue(newUser)
                                     .addOnCompleteListener(dbTask -> {
