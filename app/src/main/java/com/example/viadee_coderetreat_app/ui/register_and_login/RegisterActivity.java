@@ -1,12 +1,13 @@
 package com.example.viadee_coderetreat_app.ui.register_and_login;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -16,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.viadee_coderetreat_app.R;
+import com.example.viadee_coderetreat_app.services.RegistrationService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
@@ -24,10 +26,12 @@ import com.google.firebase.database.FirebaseDatabase;
 public class RegisterActivity extends AppCompatActivity {
 
     EditText userName, Password, Email, ID, firstName, lastName, passwordConfirmation;
-    Button registerbtn;
+    Button registerbtn ;
+    ImageButton backbtn;
     DatabaseReference dbRef;
     FirebaseAuth auth;
 
+    @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +54,8 @@ public class RegisterActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
         // Logo animation
-        ImageView logo = findViewById(R.id.logoImage);
-        logo.animate().translationYBy(-600f).setDuration(1500).start();
+       // ImageView logo = findViewById(R.id.logoImage);
+        //logo.animate().translationYBy(-600f).setDuration(1500).start();
 
         // Bind views
         userName = findViewById(R.id.userName);
@@ -62,9 +66,15 @@ public class RegisterActivity extends AppCompatActivity {
         firstName = findViewById(R.id.firstName);
         lastName = findViewById(R.id.lastName);
         registerbtn = findViewById(R.id.registerbtn);
+        backbtn = findViewById(R.id.backbtn);
 
         dbRef = FirebaseDatabase.getInstance().getReference("Users");
         auth = FirebaseAuth.getInstance();
+        /// Back to login Page 
+        backbtn.setOnClickListener(v->{
+            startActivity(new Intent(this, LoginActivity.class));
+        });
+        
         /// registration
 
         registerbtn.setOnClickListener(view -> {
@@ -93,39 +103,17 @@ public class RegisterActivity extends AppCompatActivity {
 
             Log.d("Register", "Creating user in Firebase Auth");
 
-            auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("Register", "Firebase user created.");
-                            String uid = auth.getCurrentUser().getUid();
-                            com.example.viadee_coderetreat_app.ui.register_and_login.User newUser = new com.example.viadee_coderetreat_app.ui.register_and_login.User(fName,lName,username,email, id );
-                            /// save in the RTDB
-                            dbRef.child(uid).setValue(newUser)
-                                    .addOnCompleteListener(dbTask -> {
-                                        if (dbTask.isSuccessful()) {
-                                            Log.d("Register", "User data saved to Realtime Database.");
-                                            Toast.makeText(this, "User saved !", Toast.LENGTH_LONG).show();
-                                            startActivity(new Intent(this, LoginActivity.class));
-                                        } else {
-                                            Exception e = dbTask.getException();
-                                            Log.e("Register", "Database error", e);
-                                            Toast.makeText(this, "Failed to save user: " +
-                                                    (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-                            /// Error handling
-
-                        } else {
-                            Exception e = task.getException();
-                            if (e instanceof FirebaseAuthUserCollisionException) {
-                                Toast.makeText(this, "Email already in use.", Toast.LENGTH_LONG).show();
-                            } else {
-                                Log.e("Register", "Firebase Auth error", e);
-                                Toast.makeText(this, "Auth failed: " +
-                                        (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
+            RegistrationService.registerUser(
+                    this,               // Activity context
+                    auth,               // FirebaseAuth instance
+                    dbRef,              // DatabaseReference to "users"
+                    fName,              // First name
+                    lName,              // Last name
+                    username,           // Username
+                    email,              // Email
+                    password,           // Password
+                    id                  // Custom user ID
+            );
         });
     }
 }
